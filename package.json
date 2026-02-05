@@ -1,0 +1,12 @@
+{
+  "name": "pianoman",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc -p src/tsconfig.json",
+    "watch": "tsc -p src/tsconfig.json -w"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}
