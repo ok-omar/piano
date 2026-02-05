@@ -91,18 +91,16 @@ const KEY_ID_TO_NOTE = {
 };
 // Set for pressed keyboard keys
 const pressedKeys = new Set();
-// Set for active notes in html
-const activeNotes = new Map();
 const piano = document.getElementById("piano");
-// Prevent browser gestures (zoom, scroll, context menu) on the piano area
+// Prevent browser zoom, scroll and context menu on the piano area
 if (piano) {
     piano.style.touchAction = "none";
     piano.addEventListener("contextmenu", e => e.preventDefault());
     piano.addEventListener("touchstart", e => e.preventDefault(), { passive: false });
     piano.addEventListener("touchmove", e => e.preventDefault(), { passive: false });
 }
+// KEYBOARD EVENT LISTENERS
 document.addEventListener('keydown', (event) => {
-    console.log(event);
     const key = event.key.toUpperCase();
     // return if key is not a valid key from piano
     if (!(key in KEY_TO_NOTE))
@@ -128,6 +126,7 @@ document.addEventListener('keyup', (event) => {
     // Stop the note
     noteOff(note);
 });
+// TOUCH EVENT LISTENERS
 piano.addEventListener("pointerdown", e => {
     e.preventDefault();
     if (e.target) {
@@ -136,30 +135,20 @@ piano.addEventListener("pointerdown", e => {
             noteOn(note);
     }
 });
-piano.addEventListener("pointerup", e => {
+piano.addEventListener("pointerup", e => fingerUp(e));
+piano.addEventListener("pointerleave", e => fingerUp(e));
+piano.addEventListener("pointercancel", e => fingerUp(e));
+function fingerUp(e) {
     e.preventDefault();
     if (e.target) {
         const note = noteFromElement(e.target);
         if (note)
             noteOff(note);
     }
-});
-piano.addEventListener("pointerleave", e => {
-    e.preventDefault();
-    if (e.target) {
-        const note = noteFromElement(e.target);
-        if (note)
-            noteOff(note);
-    }
-});
-piano.addEventListener("pointercancel", e => {
-    e.preventDefault();
-    if (e.target) {
-        const note = noteFromElement(e.target);
-        if (note)
-            noteOff(note);
-    }
-});
+}
+// Map for active notes 
+const activeNotes = new Map();
+// Function to make the sound of a note
 function noteOn(note) {
     if (activeNotes.has(note))
         return;
@@ -171,6 +160,7 @@ function noteOn(note) {
     document.getElementById(keyId)?.classList.add('activa');
 }
 ;
+// Function to turn off the sound of a note
 function noteOff(note) {
     const audio = activeNotes.get(note);
     if (!audio)
@@ -181,7 +171,9 @@ function noteOff(note) {
     const keyId = NOTE_TO_KEY_ID[note];
     document.getElementById(keyId)?.classList.remove('activa');
 }
+// Function to get the note for the piano key pressed
 function noteFromElement(target) {
+    // the use of .closest() here is to prevent getting the id of the text element, and instead get the id of the closest ancestor element with the id starting with "k", this works because the html order is rect > text > rect > text.
     const el = target.closest("[id^='k']");
     if (!el)
         return null;

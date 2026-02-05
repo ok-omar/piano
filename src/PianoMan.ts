@@ -103,12 +103,9 @@ const KEY_ID_TO_NOTE: Record<string, string> = {
 // Set for pressed keyboard keys
 const pressedKeys = new Set<string>();
 
-// Set for active notes in html
-const activeNotes = new Map<string, HTMLAudioElement>();
-
 const piano = document.getElementById("piano");
 
-// Prevent browser gestures (zoom, scroll, context menu) on the piano area
+// Prevent browser zoom, scroll and context menu on the piano area
 if (piano) {
   (piano as HTMLElement).style.touchAction = "none";
   piano.addEventListener("contextmenu", e => e.preventDefault());
@@ -117,9 +114,8 @@ if (piano) {
 }
 
 
-
-document.addEventListener('keydown', (event) => { 
-  console.log(event) 
+// KEYBOARD EVENT LISTENERS
+document.addEventListener('keydown', (event) => {
 	const key = event.key.toUpperCase();
 
   // return if key is not a valid key from piano
@@ -154,6 +150,8 @@ document.addEventListener('keyup', (event) => {
   noteOff(note);
 });
 
+
+// TOUCH EVENT LISTENERS
 piano!.addEventListener("pointerdown", e => {
   e.preventDefault();
   if (e.target) {
@@ -163,34 +161,23 @@ piano!.addEventListener("pointerdown", e => {
   
 })
 
-piano!.addEventListener("pointerup", e => {
-  e.preventDefault();
+piano!.addEventListener("pointerup", e => fingerUp(e))
+piano!.addEventListener("pointerleave", e => fingerUp(e))
+piano!.addEventListener("pointercancel", e => fingerUp(e))
+
+
+function fingerUp(e : Event){
+    e.preventDefault();
   if (e.target) {
     const note = noteFromElement(e.target);
     if (note) noteOff(note);
   }
-  
-})
+}
 
-piano!.addEventListener("pointerleave", e => {
-  e.preventDefault();
-  if (e.target) {
-    const note = noteFromElement(e.target);
-    if (note) noteOff(note);
-  }
-  
-})
+// Map for active notes 
+const activeNotes = new Map<string, HTMLAudioElement>();
 
-piano!.addEventListener("pointercancel", e => {
-  e.preventDefault();
-  if (e.target) {
-    const note = noteFromElement(e.target);
-    if (note) noteOff(note);
-  }
-  
-})
-
-
+// Function to make the sound of a note
 function noteOn(note : string){
   if (activeNotes.has(note)) return; 
 
@@ -204,6 +191,7 @@ function noteOn(note : string){
   document.getElementById(keyId)?.classList.add('activa');
 };
 
+// Function to turn off the sound of a note
 function noteOff(note: string) {
   const audio = activeNotes.get(note);
   if (!audio) return;
@@ -217,7 +205,9 @@ function noteOff(note: string) {
   document.getElementById(keyId)?.classList.remove('activa');
 }
 
+// Function to get the note for the piano key pressed
 function noteFromElement(target : EventTarget) : string | null {
+  // the use of .closest() here is to prevent getting the id of the text element, and instead get the id of the closest ancestor element with the id starting with "k", this works because the html order is rect > text > rect > text.
   const el = (target as HTMLElement).closest("[id^='k']");
   if (!el) return null;
   return KEY_ID_TO_NOTE[el.id] ?? null;
