@@ -108,6 +108,14 @@ const activeNotes = new Map<string, HTMLAudioElement>();
 
 const piano = document.getElementById("piano");
 
+// Prevent browser gestures (zoom, scroll, context menu) on the piano area
+if (piano) {
+  (piano as HTMLElement).style.touchAction = "none";
+  piano.addEventListener("contextmenu", e => e.preventDefault());
+  piano.addEventListener("touchstart", e => e.preventDefault(), { passive: false });
+  piano.addEventListener("touchmove", e => e.preventDefault(), { passive: false });
+}
+
 
 
 document.addEventListener('keydown', (event) => { 
