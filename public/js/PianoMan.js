@@ -137,6 +137,22 @@ piano.addEventListener("pointerup", e => {
             noteOff(note);
     }
 });
+piano.addEventListener("pointerleave", e => {
+    e.preventDefault();
+    if (e.target) {
+        const note = noteFromElement(e.target);
+        if (note)
+            noteOff(note);
+    }
+});
+piano.addEventListener("pointercancel", e => {
+    e.preventDefault();
+    if (e.target) {
+        const note = noteFromElement(e.target);
+        if (note)
+            noteOff(note);
+    }
+});
 function noteOn(note) {
     if (activeNotes.has(note))
         return;

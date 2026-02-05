@@ -164,6 +164,24 @@ piano!.addEventListener("pointerup", e => {
   
 })
 
+piano!.addEventListener("pointerleave", e => {
+  e.preventDefault();
+  if (e.target) {
+    const note = noteFromElement(e.target);
+    if (note) noteOff(note);
+  }
+  
+})
+
+piano!.addEventListener("pointercancel", e => {
+  e.preventDefault();
+  if (e.target) {
+    const note = noteFromElement(e.target);
+    if (note) noteOff(note);
+  }
+  
+})
+
 
 function noteOn(note : string){
   if (activeNotes.has(note)) return; 
